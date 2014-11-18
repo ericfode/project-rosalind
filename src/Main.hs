@@ -3,29 +3,18 @@
 
 module Main where
 
-import System.Random
-import Data.List (foldl')
+data Nukes = Nukes Int Int Int Int deriving(Show)
 
--- Number of samples to take
-count = 10000
+lettertonumber :: Char -> Nukes -> Nukes
+lettertonumber 'A' (Nukes a g c t) = Nukes (a + 1) g c t
+lettertonumber 'C' (Nukes a g c t) = Nukes a (g + 1) c t
+lettertonumber 'G' (Nukes a g c t) = Nukes a g (c + 1) t
+lettertonumber 'T' (Nukes a g c t) = Nukes a g c (t + 1)
 
--- Function to process our random sequence
-process :: [(Double, Double)] -> (Int, Int)
-process = foldl' sumInCircle (0, 0)
 
--- Function to process a running value and a random value, producing a new running value.
-sumInCircle :: (Int, Int) -> (Double, Double) -> (Int, Int)
-sumInCircle (ins, total) (x, y) = (ins + if x*x + y*y < 1.0 then 1 else 0,
-                               total + 1)
+counttiddy :: String -> Nukes
+counttiddy = foldr lettertonumber (Nukes 0 0 0 0 )
 
--- Function to display the running value.
-display:: (Int, Int) -> String
-display (heads, coins) = "π = "  ++ (show $ 4.0 * fromIntegral heads / fromIntegral coins)
+-- Take the string and for each item increment for matching letter
 
--- function to prepare the random sequence for processing
-prep :: [Double] -> [(Double, Double)]
-prep (a:b:r) = (a,b):prep r
-
-main = do
-  g <- newStdGen
-  putStrLn . display .process . take count . prep $ randoms g
+main = print $ counttiddy "ATGTCATAAATACCGCGGCTAGAGAGCTGTTGGTACTGGTGTTGAGAGAAGCAAATAGGCGCATACGATCATAATAGCTTTATCTTAATCAAAGACGGCCCCGTCAGGAGCTTGGCAAATTCTTGACAAATCGCTGCCCAATTGCTAGGCTTGTGGTATATCAGGAAGATTAGGGCTTTCCTTGCTAGCCGCGGTCCTCGCGGCCGCCGGTCCCAATAACGACCCTGGGAACTCGCTCAAGTTACAGATAGGCGGCCACGATGCATGCTCACCGGGCAGAGCAGATTATTCATTGTTGGGTGTGACCAACAGGCCGTTCGAGTACACTCGTTGCGGGAGGACTCACACAGCCCGTATACTTTCTTACGAGACCAGGTTGCAGGATATCTCTTTCCGCCAACCGAGGCTCCGCACATTTATCCGTTGAGGAATCACAACTCCATGGCCTCGGTAACGTCTCTCACCGCCTTCGGCTTGGTGCTTTCATAATTCCGGATAGTGCCCCTAGATCGCATTGCCGGTGTCTCGTTTCCCTATCGGCCAAATTTTATCCCAATCAATCCGTCGCCCCTATACTCGAGATATATTGTATTCATCTTCGGTACCGGAAATCGGATGGGAGCGAAGATGAACAGCCGAGTGGTCACGTATAGAGTGCCGCCGCATTCTGGACTGAATGAAAGGGCTCACTACCACTAACACACCGTTCGCGAAATCACAGTCCCTTAGTTCCGACGAGAACCGTATGGACCCCGATGATTGTCGTAGTTCGTTAGTGATACCTGATCCAGGCGTTCTTAGGTCAGCCGCAGCTGTAAACTAACGGGGTGCTC"
